@@ -1,0 +1,95 @@
+{
+    "version": 8,
+    "name": "Basic",
+    "metadata": {
+        "mapbox:autocomposite": true,
+        "mapbox:type": "template"
+    },
+    "sources": {
+        "mapbox": {
+            "url": "mapbox://mapbox.mapbox-streets-v7",
+            "type": "vector"
+        }
+    },
+    "sprite": "mapbox://sprites/grisha-oryol/cj12br7us008o2smz9sl31mvs",
+    "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+    "layers": [{
+            "id": "background",
+            "type": "background",
+            "paint": {
+                "background-color": "#ffffff"
+            },
+            "interactive": true
+        },
+{
+            "id": "water",
+            "type": "fill",
+            "source": "mapbox",
+            "source-layer": "water",
+ 	    "maxzoom":2,		
+            "paint": {
+                "fill-color": "#a0cfdf"
+            },
+            "interactive": true,
+	    "visibility":"None"	
+        },
+{
+            "id": "place_label_city",
+            "type": "symbol",
+            "source": "mapbox",
+            "source-layer": "place_label",
+            "maxzoom": 16,
+	    "minzoom": 4,
+            "filter": [
+                "all",
+                [
+                    "==",
+                    "$type",
+                    "Point"
+                ],
+                [
+                    "==",
+                    "type",
+                    "city"
+                ]
+
+            ],
+            "layout": {
+                "text-field": "{name_en}",
+                "text-font": [
+                    "Open Sans Bold",
+                    "Arial Unicode MS Bold"
+                ],
+                "text-max-width": 10,
+                "text-size": {
+                    "stops": [
+                        [
+                            3,
+                            12
+                        ],
+                        [
+                            8,
+                            16
+                        ]
+                    ]
+                }
+            },
+            "paint": {
+                "text-color": "#666",
+                "text-halo-color": "rgba(255,255,255,0.75)",
+                "text-halo-width": 1,
+                "text-halo-blur": 1
+            },
+            "interactive": true
+        }
+
+
+
+],
+    "draft": false,
+    "id": "cj12br7us008o2smz9sl31mvs",
+    "modified": "2017-04-03T16:22:58.188Z",
+    "owner": "grisha-oryol",
+    "visibility": "private",
+    "created": "2017-04-03T16:22:58.188Z"
+}
