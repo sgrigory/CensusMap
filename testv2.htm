@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>US Census Map</title>
+  <style type="text/css" id="gwd-text-style">
+    p {
+      margin: 0px;
+    }
+    h1 {
+      margin: 0px;
+    }
+    h2 {
+      margin: 0px;
+    }
+    h3 {
+      margin: 0px;
+    }
+  </style>
+  
+  <style type="text/css">
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+    }
+    
+    }
+  </style>
+<script src="https://d3js.org/d3.v3.js"></script>  
+<script src="https://www.w3schools.com/lib/w3data.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+</head>
+
+<body class="htmlNoPages">
+     
+    
+    
+ <style> 
+#footer
+     {
+        position: absolute;
+        text-align: center;
+         font-size: 13px
+     }     
+#wrapper
+  {
+  width:100%;
+  display: table;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top:00px;
+  outline:none;  
+  }
+#block1
+   {
+    float:left;   
+    width:50%;
+    margin-right:00px;
+    margin-left:00px;
+    outline:none;   
+   }
+#block2
+   {
+     float:right;   
+     width:50%;
+     margin-left:00px;
+     margin-right:00px;
+     outline:none;  
+    }   
+#sel1
+   {
+    width:100%;
+    position:relative;
+    top:00px;
+    left:0px;   
+    border-style: none none double none;
+    border-color: black;
+    border-width: 3px;   
+    outline:none;
+   }
+#sel2
+   {
+    width:100%;
+    position:relative;
+    top:0px;
+    left:0px;
+    border-style: none none double none;
+    border-color: black;
+    border-width: 3px;    
+    outline:none;   
+   }
+
+#map
+  {
+  width:100%;
+  margin-top:0px;
+  margin-bottom: 00px;
+  outline:none;      
+  }
+#map2
+  {
+  width:100%;
+  margin-top:0px;      
+  margin-bottom: 00px;
+  outline:none;      
+  }
+#infotab
+  { 
+   position:absolute;
+   bottom:400px;
+   left:0px;
+   background-color:#FFFFFF;
+   opacity:0.8;
+   filter: alpha(opacity=80);
+   border:1px solid black;
+   width:200px;
+   height:100px;      
+         
+  }
+
+     #vline{
+         position:absolute;
+     }
+     
+.legend
+     {
+    width:100%;
+    margin-bottom:0px; 
+     }
+     
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}   
+   
+   
+  </style>
+
+<script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />  
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.js'></script>
+  
+    
+  <div id='wrapper'>
+    
+    <div id="block1">
+        <div id='map'></div>
+        <div class="legend" id='legend1'></div>
+        <select id="sel1" onchange="fun1()"></select>
+    </div>
+   
+    <div id="block2">
+      <div id='map2'></div>
+      <div class="legend" id='legend2'></div>
+      <select id="sel2" onchange="fun2()"></select>
+    </div>
+      <div id="footer">
+        <div style="margin-left:auto;margin-right:0px;">
+      By <a href="https://www.linkedin.com/in/grigory-sizov-547b2612b/">Grisha Sizov</a>,
+      based on <a href="https://www.kaggle.com/benhamner/2016-us-election">US census data</a> and <a href="https://github.com/tonmcg/County_Level_Election_Results_12-16">2016 US election results</a>.
+            <div>
+      </div>  
+  </div>  
+    
+    <div id="vline" style="width:1px;background-color:#000"></div>
+  
+  
+  <div id="infotab">
+    <p>Show counties</p>
+  <label class="switch">
+    <input type="checkbox" id="county_state_slider" onchange="county_state_slider()">
+    <div class="slider round"></div>
+  </label>  
+    <p id="coordinates"><br> </p>
+  </div>      
+<script>
+  var map_height = 400;
+  var legend_height = 20;
+  var bottom_height = 25;    
+    
+  var bg_layer='water'
+  var draw_county_borders = false;   
+  var init_zoom = 2.6;
+  var prop,prop2;
+  var us_center = [-98.5795, 39.8282];
+  var bounds = [[us_center[0]-40,us_center[1]-20],[us_center[0]+40,us_center[1]+20]];
+  
+  var options = ['per_dem', 'per_gop',"PST120214", 'AGE135214',
+       'AGE295214', 'AGE775214', 'SEX255214', 'RHI125214',
+       'RHI225214', 'RHI325214', 'RHI425214', 'RHI525214',
+       'RHI625214', 'RHI725214', 'RHI825214', 'POP715213',
+       'POP645213', 'POP815213', 'EDU635213', 'EDU685213',
+       'VET605213', 'LFE305213', 'HSG010214', 'HSG445213',
+       'HSG096213', 'HSG495213', 'HSD310213',
+       'INC910213', 'INC110213', 'PVY020213', 'BZA010213',
+       'BZA110213', 'BZA115213', 'NES010213', 'SBO001207',
+       'SBO315207', 'SBO115207', 'SBO215207', 'SBO515207',
+       'SBO415207', 'SBO015207', 'MAN450207', 'WTN220207',
+       'RTN130207', 'AFN120207', 'BPS030214',
+       'LND110210', 'POP060210'];
+    //HSD410213,RTN131207
+  color_min = "#FFEDA0" 
+  color_max = "#BD0026"
+    
+  var map;
+//file_name = "http://127.0.0.1:8080/cb_2015_us_county_5m.json";
+
+var basePath = "http://127.0.0.1:8080/";
+//var basePath = "./";
+    
+var file_names = [ basePath+"test_states.json", basePath+"test.json"]  
+var file_name = file_names[0];
+
+var state_centers_source = basePath+"us-state-centroids.json"
+    
+var names = "abbr";
+ 
+var units = "states";
+
+var current_name = "",current_name_detailed = "";     
+
+var selected_unit_layer    
+    
+function createLayer(map,layer_number,upper) 
+    {
+       
+        
+       m3 = map.addLayer({
+        'id': 'lines',
+        'type': 'line',
+        'style': 'basic',
+        'source': "states_src",
+        'layout': {'visibility':'none'},
+        
+    }, bg_layer);   
+     
+        
+    
+    m1 = map.addLayer({
+        'id': 'fill',
+        'type': 'fill',
+        'style':'basic',
+        'source': "states_src",
+        'layout': {"visibility":"none"},
+        'paint': 
+             {
+            'fill-color':"#00FFFF",
+            'fill-opacity': 1
+             }
+       }, upper);      
+        
+    
+    m1 = map.addLayer({
+        'id': 'fill-counties',
+        'type': 'fill',
+        'style':'basic',
+        'source': "counties_src",
+        'layout': {"visibility":"none"},
+        'paint': 
+             {
+            'fill-color': "#FF00FF",
+            'fill-opacity': 1
+             }
+       }, upper);     
+        
+        
+    m2 = map.addLayer({
+        'id': 'text',
+        'type': 'symbol',
+        'style':'basic',
+        'source': {
+            'type': 'geojson',
+            'data': state_centers_source
+        },     
+        'layout': {"text-field":"{"+"name"+"}",
+                   "text-font": [
+                    "Open Sans Regular",
+                    "Arial Unicode MS Regular"
+                ],
+"text-max-width": 10,
+                "text-size": {
+                    "stops": [
+                        [
+                            3,
+                            14
+                        ],
+                        [
+                            8,
+                            22
+                        ]
+                    ]
+                },
+                "visibility":"none"   
+
+     // "text-max-size": 30,
+      //"text-letter-spacing": 0.4,
+//      "text-line-height": 1.8
+                  },
+        'paint': {"text-color": "#666",
+                "text-halo-color": "rgba(255,255,255,0.75)",
+                "text-halo-width": 1,
+                "text-halo-blur": 1}
+    }, bg_layer);    
+    
+        
+   selected_unit_layer = map.addLayer({
+        'id': 'selected_unit',
+        'type': 'line',
+        'style':'basic',
+        'source': "states_src",
+        'layout': {"visibility":"none"},
+        'filter':['==',"name",""],
+        'paint':{
+            "line-color":"#000000",
+            "line-width": 3
+        }
+    }, bg_layer)     
+        
+    console.log("selected layer:",selected_unit_layer)
+        
+    }
+    
+function setVisibility(map,layer_number, prop,counties_flag,visibility)
+    {
+     console.log("setting visibility:",map,layer_number,prop,counties_flag,visibility)
+        
+    /*      if (counties_flag)
+    {
+        
+        map.setLayoutProperty("lines-counties"+prop,"visibility",visibility)
+        
+    
+        //console.log('lines-counties'+prop,m4)
+    }*/
+    
+    map.setLayoutProperty("fill-counties","visibility","none")
+    map.setLayoutProperty("fill","visibility","none")
+        
+    if    (document.getElementById("county_state_slider").checked)
+        
+        map.setLayoutProperty("fill-counties","visibility",visibility)
+    
+    else
+        map.setLayoutProperty("fill","visibility",visibility)    
+      
+     map.setLayoutProperty("lines","visibility",visibility)
+      
+     map.setLayoutProperty("text","visibility",visibility) 
+     
+     map.setLayoutProperty("selected_unit","visibility",visibility)
+        
+      console.log("finish setVisability")
+        
+    }
+
+function updateFill(map,prop)
+    {
+     console.log("updating fill:",map,prop)    
+    /* map.getLayer("fill").paint = {
+                 property:prop,
+                 type:'exponential',
+                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
+                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
+                 }*/
+    map.setPaintProperty("fill","fill-color",{
+                 property:prop,
+                 type:'exponential',
+                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
+                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
+                 })
+        
+    map.setPaintProperty("fill-counties","fill-color",{
+                 property:prop,
+                 type:'exponential',
+                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
+                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
+                 })
+    
+       /* 
+    map.getLayer("fill").paint = {
+                 property:prop,
+                 type:'exponential',
+                 stops:[[0,color_min], //rgba(0,0,100,0.75)"
+                        [1,color_max]]//"rgba(100,0,0,0.75)"
+    }
+        
+    map.getLayer("fill-counties").paint = {
+                 property:prop,
+                 type:'exponential',
+                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
+                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
+                 }  
+    */
+console.log("finish updateFill")
+    }
+    
+    
+    
+function layer(map,layer_number,prop)  
+  { 
+      
+    var upper;
+    
+    var counties_flag = document.getElementById("county_state_slider").checked && draw_county_borders  
+      
+    map.addSource("states_src", {
+            'type': 'geojson',
+            'data': file_names[0],
+            buffer: 256
+        }
+                 )
+        
+    map.addSource("counties_src", {
+            'type': 'geojson',
+            'data': file_names[1],
+            buffer: 256
+        }
+                 )
+  /*  if (counties_flag)
+       
+        upper = "lines-counties"  
+      
+    else*/
+        
+    upper = "lines"
+      
+    console.log("creating layers.. ")
+      
+   // for (var i=0;i<options.length;i++)
+    createLayer(map,layer_number,upper)
+    
+    updateFill(map,prop)  
+      
+    setVisibility(map, layer_number,prop,counties_flag,"visible")
+      
+
+    console.log("finish layer")      
+   /* console.log('fill'+layer_number,m1)
+    console.log('text'+layer_number,m2)  
+    console.log('lines'+layer_number,m3)  */
+    
+ };
+  
+ function layer1()
+    {
+      console.log("enter layer1")    
+      var prop = document.getElementById("sel"+1).value;    
+      layer(map,1,prop)
+    }
+    
+    function layer2()
+    {
+    
+      console.log("enter layer2")    
+      var prop2=document.getElementById("sel"+2).value;       
+      layer(map2,2,prop2)
+    }  
+  
+   function fun(map,ln)
+    {
+      console.log("fun:", map,ln)    
+      var counties_flag = document.getElementById("county_state_slider").checked && draw_county_borders
+      
+      setVisibility(map, ln, prop, counties_flag, "none")
+        
+      var p0 = document.getElementById("sel"+ln).value
+      
+      if (ln==1)
+        prop = p0
+      else
+        prop2 = p0   
+    
+          
+      setVisibility(map, ln, p0, counties_flag, "visible")
+        
+      updateFill(map,p0)    
+        
+      d3.select("#legend"+ln).selectAll("*").remove()
+      add_legend("#legend"+ln,p0)  
+   
+      console.log("finish fun")     
+    }
+    
+   function fun1(event)
+    {
+      fun(map,1) 
+    }
+    
+    function fun2(event)
+    {
+      fun(map2,2)
+    }  
+  
+    
+function on_zoom1(data)
+  {
+    map2.setZoom(map.getZoom())
+    map2.setCenter(map.getCenter()) 
+  }
+function on_zoom2(data)  
+  {
+    map.setZoom(map2.getZoom())
+    map.setCenter(map2.getCenter())
+  }
+
+ 
+    
+function on_mousemove(e,map0,layer_number)
+    {
+        //console.log("mousemove: ",map0,layer_number)
+        var fill_layer = document.getElementById("county_state_slider").checked ? 'fill-counties':'fill'
+        
+        features = map0.queryRenderedFeatures(e.point,{layers:[fill_layer]});
+        
+        if (features && features.length)
+     
+        { 
+         console.log("in! "+layer_number)
+    
+        if (features[0].properties.abbr!=current_name)
+        {   
+        console.log("changed from "+current_name+" to "+features[0].properties.abbr)
+            
+            
+        map.setFilter('selected_unit', ['==',"abbr",features[0].properties.abbr])    
+        map2.setFilter('selected_unit', ['==',"abbr",features[0].properties.abbr])    
+            
+        current_name = features[0].properties.abbr
+        console.log("current name "+current_name)    
+        }
+        }    
+     else
+
+     {
+    console.log("out! "+layer_number)       
+    map.setFilter('selected_unit',["==","abbr",""])    
+    map2.setFilter('selected_unit',["==","abbr",""])    
+           
+    current_name = ""
+     }   
+    
+    var features_detailed = features;    
+        
+    if  (features_detailed && features_detailed.length)
+    {
+        if (features_detailed[0].properties.name!=current_name_detailed)
+            {
+                document.getElementById('coordinates').innerHTML = features_detailed[0].properties.name+", "+features_detailed[0].properties.abbr+
+        "<br> "+"Total votes: "+features_detailed[0].properties.total_votes
+
+                current_name_detailed = features_detailed[0].properties.name
+            }
+
+    }
+    else
+    {   
+    document.getElementById('coordinates').innerHTML = "<br><br>"; 
+    
+    
+    }
+}
+    
+function on_mousemove1(e) {
+    
+    on_mousemove(e,map,1)   
+    
+}
+  
+function on_mousemove2(e) {
+
+    on_mousemove(e,map2,2)
+    
+}    
+    
+function county_state_slider(e)
+  {
+    console.log("switched!")
+    file_name = document.getElementById("county_state_slider").checked?file_names[1]:file_names[0];
+    units = document.getElementById("county_state_slider").checked?"counties":"states";
+    fun1(e);
+    fun2(e);
+  }
+  var ticks;
+
+    function add_legend(legend,prop) 
+      {
+        var n_ticks=10;
+          
+        mn=maxmins.responseJSON[units]['mins'][prop]
+        mx=maxmins.responseJSON[units]['maxs'][prop]
+        
+        var prec=2
+            if ((mn>10) || (mx<0.1))
+                prec=3  
+          
+           if (mx<0.01)
+            prec = 4
+           if (mx<0.00001)
+           {
+               prec = 15
+                n_ticks = 5
+               
+           }
+        
+          
+          
+        var tmp=d3.select("#block1").style("width")
+        var block_width=Number(tmp.substring(0,tmp.length-2))/n_ticks;
+        console.log("blockwidth:",block_width)  
+        ticks = [];
+          
+        for (var i=0;i<n_ticks;i++)  
+            ticks.push(mn+i*(mx-mn)/(n_ticks+0.00000001))
+        console.log(ticks)
+        colors = d3.scale.linear().domain([1,n_ticks])
+      .interpolate(d3.interpolateRgb)
+      .range([d3.rgb(color_min), d3.rgb(color_max)])
+       
+    var svg;
+          
+           
+          
+       for (var i=0;i<n_ticks;i++)              
+        {
+          console.log(colors(i));
+            
+            svg = d3.select(legend).append("svg")
+                .style("width",block_width).style("height",legend_height+"px")
+                .style("left",block_width*i+"px")//.style("position","absolute").style("x",0).style("y",0)
+            
+            svg.append("rect")
+            .attr("x",0)
+            .attr("y",0)
+            .attr("width",block_width)
+            .attr("height",legend_height)
+            .style("fill",colors(i))
+            //.style("stroke","black")
+            
+            
+         
+            
+            svg.append("text").text(ticks[i].toPrecision(prec))
+                .attr("x",5).attr("y",legend_height-5)
+            .attr('fill', 'black')
+            .attr("font-family","Calibri")
+        
+        }
+      }    
+    
+    
+  var features;
+  
+function on_data_load(data) 
+  {
+      
+   
+     console.log(data); 
+     console.log("minmax: ",maxmins);
+     
+     for (i=0;i<options.length;i+=1)
+     {
+       var opt = document.createElement('option');
+       opt.value = options[i];
+       opt.innerHTML = maxmins.responseJSON[units]['names'][options[i]];
+       document.getElementById("sel1").add(opt);
+       
+       opt=document.createElement('option');
+       opt.value=options[i];
+       opt.innerHTML=maxmins.responseJSON[units]['names'][options[i]];
+       document.getElementById("sel2").add(opt);
+     }
+     document.getElementById("sel1").size =  options.length
+     document.getElementById("sel2").size =  options.length
+     
+     prop=document.getElementById("sel1").value;
+     prop2=document.getElementById("sel2").value;
+     console.log('prop: ', prop);
+     
+     prop=document.getElementById("sel1").value;
+    prop2=document.getElementById("sel2").value;
+    
+    add_legend("#legend1",prop)  
+    add_legend("#legend2",prop2)   
+   
+     mapboxgl.accessToken =     'pk.eyJ1IjoiZ3Jpc2hhLW9yeW9sIiwiYSI6ImNqMHQ5enBwMjAwMzgzMm1kZWZienpocHcifQ.VBX7lf9bFidmi0TG3nQs7Q';
+    map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: basePath+"style1.json",
+    center: us_center, // starting position
+    zoom: init_zoom, // starting zoom
+    maxZoom: 6,
+    minZoom: init_zoom,
+    maxBounds: bounds,
+    });
+    
+    map2 = new mapboxgl.Map({
+    container: 'map2', // container id       
+    style: basePath+"style1.json",
+    center: us_center, // starting position
+    zoom: init_zoom, // starting zoom
+    maxZoom: 6,
+    minZoom: init_zoom,
+    maxBounds: bounds
+    });
+  
+    
+    
+
+    
+    map.on('load', layer1);
+    map.on('zoom', on_zoom1);
+    map.on('drag', on_zoom1);
+    map.on("mousemove",on_mousemove1);
+    
+   
+    map2.on('load', layer2);
+    map2.on('zoom', on_zoom2);
+    map2.on('drag', on_zoom2);
+    map2.on("mousemove",on_mousemove2);
+      
+    map.dragRotate.disable();
+    map.touchZoomRotate.disableRotation();
+    
+    map2.dragRotate.disable();
+    map2.touchZoomRotate.disableRotation();
+    
+    d3.selectAll("legend").style("height",legend_height+"px")
+    d3.select("#wrapper").style("height",map_height+"px")
+    d3.select("#map").style("height",map_height+"px")
+    d3.select("#map2").style("height",map_height+"px")
+    d3.select("#block1").style("height",map_height+"px")  
+    d3.select("#block2").style("height",map_height+"px")  
+    d3.select("#sel1").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")
+    d3.select("#sel2").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")  
+    
+      
+    d3.select("#footer").style("top",window.innerHeight-bottom_height+7+"px").style("left","0px").style("width",window.innerWidth+"px").style("height",bottom_height+"px")   
+    
+      d3.select("#vline").style("left",window.innerWidth/2+"px").style("bottom",bottom_height+3+"px").style("height",(window.innerHeight-bottom_height+3)+"px")    
+    
+    
+      
+    document.getElementsByClassName('mapboxgl-canvas')[0].style.height=map_height+"px";
+    document.getElementsByClassName('mapboxgl-canvas')[1].style.height=map_height+"px";
+    map.resize();
+    map2.resize();  
+      
+      
+ }
+  
+  
+     
+ var maxmins = $.getJSON(basePath+"maxmins.json", on_data_load) 
+ 
+
+</script>
+  
+</body>
+
+</html>
