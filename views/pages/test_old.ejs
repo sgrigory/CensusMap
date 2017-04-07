@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>US Census Map</title>
+  <title></title>
   <style type="text/css" id="gwd-text-style">
     p {
       margin: 0px;
@@ -29,21 +29,20 @@
     }
   </style>
 <script src="https://d3js.org/d3.v3.js"></script>  
-<script src="https://www.w3schools.com/lib/w3data.js"></script>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 </head>
 
+ 
 <body class="htmlNoPages">
      
+
+    
+    <script src="https://www.w3schools.com/lib/w3data.js"></script>
+  
     
     
  <style> 
-#footer
-     {
-        position: absolute;
-        text-align: center;
-         font-size: 13px
-     }     
 #wrapper
   {
   width:100%;
@@ -51,7 +50,6 @@
   margin-right: auto;
   margin-left: auto;
   margin-top:00px;
-  outline:none;  
   }
 #block1
    {
@@ -59,15 +57,13 @@
     width:50%;
     margin-right:00px;
     margin-left:00px;
-    outline:none;   
    }
 #block2
    {
      float:right;   
      width:50%;
      margin-left:00px;
-     margin-right:00px;
-     outline:none;  
+     margin-right:00px;      
     }   
 #sel1
    {
@@ -75,10 +71,7 @@
     position:relative;
     top:00px;
     left:0px;   
-    border-style: none none double none;
-    border-color: black;
-    border-width: 3px;   
-    outline:none;
+    
    }
 #sel2
    {
@@ -86,25 +79,19 @@
     position:relative;
     top:0px;
     left:0px;
-    border-style: none none double none;
-    border-color: black;
-    border-width: 3px;    
-    outline:none;   
    }
 
 #map
   {
   width:100%;
   margin-top:0px;
-  margin-bottom: 00px;
-  outline:none;      
+  margin-bottom: 00px;     
   }
 #map2
   {
   width:100%;
   margin-top:0px;      
   margin-bottom: 00px;
-  outline:none;      
   }
 #infotab
   { 
@@ -122,6 +109,7 @@
 
      #vline{
          position:absolute;
+         top:0px;
      }
      
 .legend
@@ -193,8 +181,9 @@ input:checked + .slider:before {
   </style>
 
 <script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />  
-<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+  
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.js'></script>
   
     
   <div id='wrapper'>
@@ -210,15 +199,10 @@ input:checked + .slider:before {
       <div class="legend" id='legend2'></div>
       <select id="sel2" onchange="fun2()"></select>
     </div>
-      <div id="footer">
-        <div style="margin-left:auto;margin-right:0px;">
-      By <a href="https://www.linkedin.com/in/grigory-sizov-547b2612b/">Grisha Sizov</a>,
-      based on <a href="https://www.kaggle.com/benhamner/2016-us-election">US census data</a> and <a href="https://github.com/tonmcg/County_Level_Election_Results_12-16">2016 US election results</a>.
-            <div>
-      </div>  
+    
   </div>  
     
-    <div id="vline" style="width:1px;background-color:#000"></div>
+    <div id="vline" style="width:1px;height:500px;background-color:#000"></div>
   
   
   <div id="infotab">
@@ -232,7 +216,7 @@ input:checked + .slider:before {
 <script>
   var map_height = 400;
   var legend_height = 20;
-  var bottom_height = 25;    
+  var bottom_height = 20;    
     
   var bg_layer='water'
   var draw_county_borders = false;   
@@ -240,21 +224,18 @@ input:checked + .slider:before {
   var prop,prop2;
   var us_center = [-98.5795, 39.8282];
   var bounds = [[us_center[0]-40,us_center[1]-20],[us_center[0]+40,us_center[1]+20]];
+  var options = ['per_dem','per_gop','PST120214',     'AGE135214',     'AGE295214',
+           'AGE775214',     'SEX255214',     'RHI225214',     'RHI425214',
+           'RHI625214',     'RHI725214',     'RHI825214',     'POP715213',
+           'POP645213',     'POP815213',     'EDU635213',     'EDU685213',
+           'VET605213',     'LFE305213',     'HSG010214',     'HSG445213',
+           'HSG096213',     'HSG495213',     'HSD310213',     'INC910213',
+           'INC110213',     'PVY020213',     'BZA010213',     'BZA110213',
+           'BZA115213',     'NES010213',     'SBO001207',     'SBO315207',
+           'SBO415207',     'SBO015207',     'MAN450207',     'WTN220207',
+           'RTN131207',     'AFN120207',     'BPS030214',     'POP060210'];
   
-  var options = ['per_dem', 'per_gop',"PST120214", 'AGE135214',
-       'AGE295214', 'AGE775214', 'SEX255214', 'RHI125214',
-       'RHI225214', 'RHI325214', 'RHI425214', 'RHI525214',
-       'RHI625214', 'RHI725214', 'RHI825214', 'POP715213',
-       'POP645213', 'POP815213', 'EDU635213', 'EDU685213',
-       'VET605213', 'LFE305213', 'HSG010214', 'HSG445213',
-       'HSG096213', 'HSG495213', 'HSD310213',
-       'INC910213', 'INC110213', 'PVY020213', 'BZA010213',
-       'BZA110213', 'BZA115213', 'NES010213', 'SBO001207',
-       'SBO315207', 'SBO115207', 'SBO215207', 'SBO515207',
-       'SBO415207', 'SBO015207', 'MAN450207', 'WTN220207',
-       'RTN130207', 'AFN120207', 'BPS030214',
-       'LND110210', 'POP060210'];
-    //HSD410213,RTN131207
+    
   color_min = "#FFEDA0" 
   color_max = "#BD0026"
     
@@ -274,54 +255,91 @@ var names = "abbr";
 var units = "states";
 
 var current_name = "",current_name_detailed = "";     
-
-var selected_unit_layer    
     
-function createLayer(map,layer_number,upper) 
+function layer(map,layer_number,prop)  
+  { 
+    console.log("creating layers.. ")
+    
+    var m1,m2,m3,m4;
+    
+   var upper = "lines";
+      
+    if (document.getElementById("county_state_slider").checked && draw_county_borders)
     {
-       
-        
-       m3 = map.addLayer({
-        'id': 'lines',
+        upper = "lines-counties"
+        m4 = map.addLayer({
+        'id': 'lines-counties'+layer_number,
         'type': 'line',
-        'style': 'basic',
-        'source': "states_src",
-        'layout': {'visibility':'none'},
+        'style':'basic',
+        'source': {
+            'type': 'geojson',
+            'data': file_name,
+          //'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_urban_areas.geojson'
+        },
+        'layout': {},
+         'paint':
+         {"line-color": "#ffffff",
+                "line-width": {
+                    "base": 1.0,
+                    "stops": [
+                        [
+                            8,
+                            0.5
+                        ],
+                        [
+                            20,
+                            15
+                        ]
+                    ]
+                }
+
+         }
+    }, bg_layer);
         
-    }, bg_layer);   
+    
+    console.log('lines-counties'+layer_number,m4)
+    }
+      
+     m3 = map.addLayer({
+        'id': 'lines'+layer_number,
+        'type': 'line',
+        'style':'basic',
+        'source': {
+            'type': 'geojson',
+            'data': file_names[0]
+          //'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_urban_areas.geojson'
+        },
+        'layout': {},
+        
+    }, bg_layer);  
+      
+      
+    m1 = map.addLayer({
+        'id': 'fill'+layer_number,
+        'type': 'fill',
+        'style':'basic',
+        'source': {
+            'type': 'geojson',
+            'data': file_name
+        },
+        'layout': {},
+        'paint': 
+             {
+            'fill-color': 
+                 {
+                 property:prop,
+                 type:'exponential',
+                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
+                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
+                 },
+            'fill-opacity': 1
+             }
+       }, upper+layer_number);  
+      
      
-        
-    
-    m1 = map.addLayer({
-        'id': 'fill',
-        'type': 'fill',
-        'style':'basic',
-        'source': "states_src",
-        'layout': {"visibility":"none"},
-        'paint': 
-             {
-            'fill-color':"#00FFFF",
-            'fill-opacity': 1
-             }
-       }, upper);      
-        
-    
-    m1 = map.addLayer({
-        'id': 'fill-counties',
-        'type': 'fill',
-        'style':'basic',
-        'source': "counties_src",
-        'layout': {"visibility":"none"},
-        'paint': 
-             {
-            'fill-color': "#FF00FF",
-            'fill-opacity': 1
-             }
-       }, upper);     
-        
-        
-    m2 = map.addLayer({
-        'id': 'text',
+      
+        m2 = map.addLayer({
+        'id': 'text'+layer_number,
         'type': 'symbol',
         'style':'basic',
         'source': {
@@ -345,8 +363,7 @@ function createLayer(map,layer_number,upper)
                             22
                         ]
                     ]
-                },
-                "visibility":"none"   
+                }
 
      // "text-max-size": 30,
       //"text-letter-spacing": 0.4,
@@ -356,185 +373,78 @@ function createLayer(map,layer_number,upper)
                 "text-halo-color": "rgba(255,255,255,0.75)",
                 "text-halo-width": 1,
                 "text-halo-blur": 1}
-    }, bg_layer);    
-    
-        
+             
+    // This is the important part of this example: the addLayer
+    // method takes 2 arguments: the layer as an object, and a string
+    // representing another layer's name. if the other layer
+    // exists in the stylesheet already, the new layer will be positioned
+    // right before that layer in the stack, making it possible to put
+    // 'overlays' anywhere in the layer stack.
+    }, bg_layer);
+   
    selected_unit_layer = map.addLayer({
-        'id': 'selected_unit',
+        'id': 'selected_unit'+layer_number,
         'type': 'line',
         'style':'basic',
-        'source': "states_src",
-        'layout': {"visibility":"none"},
+        'source': {
+            'type': 'geojson',
+            'data': file_names[0]
+        },
+        'layout': {},
         'filter':['==',"name",""],
         'paint':{
             "line-color":"#000000",
             "line-width": 3
         }
-    }, bg_layer)     
-        
-    console.log("selected layer:",selected_unit_layer)
-        
-    }
+    }, bg_layer)
     
-function setVisibility(map,layer_number, prop,counties_flag,visibility)
-    {
-     console.log("setting visibility:",map,layer_number,prop,counties_flag,visibility)
-        
-    /*      if (counties_flag)
-    {
-        
-        map.setLayoutProperty("lines-counties"+prop,"visibility",visibility)
-        
-    
-        //console.log('lines-counties'+prop,m4)
-    }*/
-    
-    map.setLayoutProperty("fill-counties","visibility","none")
-    map.setLayoutProperty("fill","visibility","none")
-        
-    if    (document.getElementById("county_state_slider").checked)
-        
-        map.setLayoutProperty("fill-counties","visibility",visibility)
-    
-    else
-        map.setLayoutProperty("fill","visibility",visibility)    
-      
-     map.setLayoutProperty("lines","visibility",visibility)
-      
-     map.setLayoutProperty("text","visibility",visibility) 
-     
-     map.setLayoutProperty("selected_unit","visibility",visibility)
-        
-      console.log("finish setVisability")
-        
-    }
-
-function updateFill(map,prop)
-    {
-     console.log("updating fill:",map,prop)    
-    /* map.getLayer("fill").paint = {
-                 property:prop,
-                 type:'exponential',
-                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
-                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
-                 }*/
-    map.setPaintProperty("fill","fill-color",{
-                 property:prop,
-                 type:'exponential',
-                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
-                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
-                 })
-        
-    map.setPaintProperty("fill-counties","fill-color",{
-                 property:prop,
-                 type:'exponential',
-                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
-                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
-                 })
-    
-       /* 
-    map.getLayer("fill").paint = {
-                 property:prop,
-                 type:'exponential',
-                 stops:[[0,color_min], //rgba(0,0,100,0.75)"
-                        [1,color_max]]//"rgba(100,0,0,0.75)"
-    }
-        
-    map.getLayer("fill-counties").paint = {
-                 property:prop,
-                 type:'exponential',
-                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
-                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
-                 }  
-    */
-console.log("finish updateFill")
-    }
-    
-    
-    
-function layer(map,layer_number,prop)  
-  { 
-      
-    var upper;
-    
-    var counties_flag = document.getElementById("county_state_slider").checked && draw_county_borders  
-      
-    map.addSource("states_src", {
-            'type': 'geojson',
-            'data': file_names[0],
-            buffer: 256
-        }
-                 )
-        
-    map.addSource("counties_src", {
-            'type': 'geojson',
-            'data': file_names[1],
-            buffer: 256
-        }
-                 )
-  /*  if (counties_flag)
-       
-        upper = "lines-counties"  
-      
-    else*/
-        
-    upper = "lines"
-      
-    console.log("creating layers.. ")
-      
-   // for (var i=0;i<options.length;i++)
-    createLayer(map,layer_number,upper)
-    
-    updateFill(map,prop)  
-      
-    setVisibility(map, layer_number,prop,counties_flag,"visible")
-      
-
-    console.log("finish layer")      
-   /* console.log('fill'+layer_number,m1)
+          
+    console.log('fill'+layer_number,m1)
     console.log('text'+layer_number,m2)  
-    console.log('lines'+layer_number,m3)  */
+    console.log('lines'+layer_number,m3)  
     
  };
   
  function layer1()
     {
-      console.log("enter layer1")    
-      var prop = document.getElementById("sel"+1).value;    
+      var prop=document.getElementById("sel"+1).value;    
       layer(map,1,prop)
     }
     
     function layer2()
     {
-    
-      console.log("enter layer2")    
       var prop2=document.getElementById("sel"+2).value;       
       layer(map2,2,prop2)
     }  
   
-   function fun(map,ln)
+   function fun(map,ln,prop)
     {
-      console.log("fun:", map,ln)    
-      var counties_flag = document.getElementById("county_state_slider").checked && draw_county_borders
-      
-      setVisibility(map, ln, prop, counties_flag, "none")
+      prop=document.getElementById("sel"+ln).value;
+      map.removeLayer('fill'+ln);
+      map.removeSource('fill'+ln);
         
-      var p0 = document.getElementById("sel"+ln).value
       
-      if (ln==1)
-        prop = p0
-      else
-        prop2 = p0   
+      map.removeLayer('lines'+ln);
+      map.removeSource('lines'+ln);
+     
+      map.removeLayer('text'+ln);
+      map.removeSource('text'+ln);
+        
+      map.removeLayer('selected_unit'+ln);
+      map.removeSource('selected_unit'+ln)    
     
-          
-      setVisibility(map, ln, p0, counties_flag, "visible")
+      if (map.getLayer('lines-counties'+ln))
+      {
+          map.removeLayer('lines-counties'+ln);
+          map.removeSource('lines-counties'+ln);
+      }
         
-      updateFill(map,p0)    
-        
+      layer(map,ln,prop);   
+    
       d3.select("#legend"+ln).selectAll("*").remove()
-      add_legend("#legend"+ln,p0)  
+      add_legend("#legend"+ln,prop)  
    
-      console.log("finish fun")     
+        
     }
     
    function fun1(event)
@@ -563,10 +473,8 @@ function on_zoom2(data)
     
 function on_mousemove(e,map0,layer_number)
     {
-        //console.log("mousemove: ",map0,layer_number)
-        var fill_layer = document.getElementById("county_state_slider").checked ? 'fill-counties':'fill'
-        
-        features = map0.queryRenderedFeatures(e.point,{layers:[fill_layer]});
+        //console.log("mousemove "+layer_number)   
+        features = map0.queryRenderedFeatures(e.point,{layers:['fill'+layer_number]});
         
         if (features && features.length)
      
@@ -578,8 +486,8 @@ function on_mousemove(e,map0,layer_number)
         console.log("changed from "+current_name+" to "+features[0].properties.abbr)
             
             
-        map.setFilter('selected_unit', ['==',"abbr",features[0].properties.abbr])    
-        map2.setFilter('selected_unit', ['==',"abbr",features[0].properties.abbr])    
+        map.setFilter('selected_unit1',['==',"abbr",features[0].properties.abbr])    
+        map2.setFilter('selected_unit2',['==',"abbr",features[0].properties.abbr])    
             
         current_name = features[0].properties.abbr
         console.log("current name "+current_name)    
@@ -588,9 +496,10 @@ function on_mousemove(e,map0,layer_number)
      else
 
      {
-    console.log("out! "+layer_number)       
-    map.setFilter('selected_unit',["==","abbr",""])    
-    map2.setFilter('selected_unit',["==","abbr",""])    
+    console.log("out! "+layer_number)     
+   // document.getElementById('coordinates').innerHTML = "<br><br>";   
+    map.setFilter('selected_unit1',["==","abbr",""])    
+    map2.setFilter('selected_unit2',["==","abbr",""])    
            
     current_name = ""
      }   
@@ -618,6 +527,7 @@ function on_mousemove(e,map0,layer_number)
     
 function on_mousemove1(e) {
     
+    
     on_mousemove(e,map,1)   
     
 }
@@ -633,49 +543,32 @@ function county_state_slider(e)
     console.log("switched!")
     file_name = document.getElementById("county_state_slider").checked?file_names[1]:file_names[0];
     units = document.getElementById("county_state_slider").checked?"counties":"states";
+      //names = document.getElementById("county_state_slider").checked? "name" :"NAME";
     fun1(e);
     fun2(e);
   }
-  var ticks;
+  
 
     function add_legend(legend,prop) 
       {
-        var n_ticks=10;
-          
+        
         mn=maxmins.responseJSON[units]['mins'][prop]
         mx=maxmins.responseJSON[units]['maxs'][prop]
         
-        var prec=2
-            if ((mn>10) || (mx<0.1))
-                prec=3  
-          
-           if (mx<0.01)
-            prec = 4
-           if (mx<0.00001)
-           {
-               prec = 15
-                n_ticks = 5
-               
-           }
-        
-          
-          
+        var n_ticks=10;
         var tmp=d3.select("#block1").style("width")
-        var block_width=Number(tmp.substring(0,tmp.length-2))/n_ticks;
+          var block_width=Number(tmp.substring(0,tmp.length-2))/n_ticks;
         console.log("blockwidth:",block_width)  
-        ticks = [];
+        var ticks = [];
           
         for (var i=0;i<n_ticks;i++)  
-            ticks.push(mn+i*(mx-mn)/(n_ticks+0.00000001))
+            ticks.push(mn+i*(mx-mn)/n_ticks)
         console.log(ticks)
         colors = d3.scale.linear().domain([1,n_ticks])
       .interpolate(d3.interpolateRgb)
       .range([d3.rgb(color_min), d3.rgb(color_max)])
        
     var svg;
-          
-           
-          
        for (var i=0;i<n_ticks;i++)              
         {
           console.log(colors(i));
@@ -693,13 +586,16 @@ function county_state_slider(e)
             //.style("stroke","black")
             
             
-         
-            
-            svg.append("text").text(ticks[i].toPrecision(prec))
+
+            svg.append("text").text(ticks[i].toPrecision(2))
                 .attr("x",5).attr("y",legend_height-5)
             .attr('fill', 'black')
             .attr("font-family","Calibri")
+        // d3.select(legend).append("div").attr("x",block_width*(i)).attr("y",30).text(ticks[i].toPrecision(2))
         
+        /*    d3.select(legend).append("div").text(ticks[i].toPrecision(2))
+                .style("position","absolute")
+                .style("left",block_width*(i)+"px").style("bottom","30px").style("text-align","center")*/
         }
       }    
     
@@ -760,20 +656,21 @@ function on_data_load(data)
     });
   
     
-    
 
     
     map.on('load', layer1);
     map.on('zoom', on_zoom1);
     map.on('drag', on_zoom1);
+    
+ 
     map.on("mousemove",on_mousemove1);
     
-   
+    map2.on("mousemove",on_mousemove2);
+    
     map2.on('load', layer2);
     map2.on('zoom', on_zoom2);
     map2.on('drag', on_zoom2);
-    map2.on("mousemove",on_mousemove2);
-      
+    
     map.dragRotate.disable();
     map.touchZoomRotate.disableRotation();
     
@@ -789,12 +686,7 @@ function on_data_load(data)
     d3.select("#sel1").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")
     d3.select("#sel2").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")  
     
-      
-    d3.select("#footer").style("top",window.innerHeight-bottom_height+7+"px").style("left","0px").style("width",window.innerWidth+"px").style("height",bottom_height+"px")   
-    
-      d3.select("#vline").style("left",window.innerWidth/2+"px").style("bottom",bottom_height+3+"px").style("height",(window.innerHeight-bottom_height+3)+"px")    
-    
-    
+    d3.select("#vline").style("left",window.innerWidth/2+"px").style("height",window.innerHeight)  
       
     document.getElementsByClassName('mapboxgl-canvas')[0].style.height=map_height+"px";
     document.getElementsByClassName('mapboxgl-canvas')[1].style.height=map_height+"px";
