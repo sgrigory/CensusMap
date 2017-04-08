@@ -109,15 +109,12 @@
 #infotab
   { 
    position:absolute;
-   bottom:400px;
    left:0px;
    background-color:#FFFFFF;
    opacity:0.8;
    filter: alpha(opacity=80);
    border:1px solid black;
    width:200px;
-   height:100px;      
-         
   }
 
      #vline{
@@ -213,7 +210,7 @@ input:checked + .slider:before {
       <div id="footer">
         <div style="margin-left:auto;margin-right:0px;">
       By <a href="https://www.linkedin.com/in/grigory-sizov-547b2612b/">Grisha Sizov</a>,
-      based on <a href="https://www.kaggle.com/benhamner/2016-us-election">US census data</a> and <a href="https://github.com/tonmcg/County_Level_Election_Results_12-16">2016 US election results</a>.
+      based on <a href="https://www.kaggle.com/benhamner/2016-us-election">US census data</a>, <a href="https://github.com/tonmcg/County_Level_Election_Results_12-16">2016 US election results</a> and <a href="https://www.mapbox.com/mapbox-gl-js/api/">Mapbox</a>.
             <div>
       </div>  
   </div>  
@@ -232,14 +229,15 @@ input:checked + .slider:before {
 <script>
   var map_height = 400;
   var legend_height = 20;
-  var bottom_height = 25;    
+  var bottom_height = 25;
+  var infotab_height = 100;    
     
   var bg_layer='water'
   var draw_county_borders = false;   
-  var init_zoom = 2.6;
+  var init_zoom = 2.5;
   var prop,prop2;
-  var us_center = [-98.5795, 39.8282];
-  var bounds = [[us_center[0]-40,us_center[1]-20],[us_center[0]+40,us_center[1]+20]];
+  var us_center = [-98.5795, 39.8282+0.7];
+  var bounds = [[us_center[0]-45,us_center[1]-22],[us_center[0]+40,us_center[1]+15]];
   
   var options = ['per_dem', 'per_gop',"PST120214", 'AGE135214',
        'AGE295214', 'AGE775214', 'SEX255214', 'RHI125214',
@@ -275,6 +273,8 @@ var units = "states";
 
 var current_name = "",current_name_detailed = "";     
 
+var default_text = "US<br>Population: 326625791<br>Total votes: 130188251"    
+    
 var selected_unit_layer    
     
 function createLayer(map,layer_number,upper) 
@@ -593,16 +593,19 @@ function on_mousemove(e,map0,layer_number)
     map2.setFilter('selected_unit',["==","abbr",""])    
            
     current_name = ""
+    current_name_detailed= ""     
      }   
     
     var features_detailed = features;    
+    
         
     if  (features_detailed && features_detailed.length)
     {
         if (features_detailed[0].properties.name!=current_name_detailed)
-            {
+            {   
+                console.log(features_detailed)
                 document.getElementById('coordinates').innerHTML = features_detailed[0].properties.name+", "+features_detailed[0].properties.abbr+
-        "<br> "+"Total votes: "+features_detailed[0].properties.total_votes
+        "<br> "+"Population: "+features_detailed[0].properties['PST045214']+"<br>"+"Total votes: "+features_detailed[0].properties.total_votes
 
                 current_name_detailed = features_detailed[0].properties.name
             }
@@ -610,7 +613,7 @@ function on_mousemove(e,map0,layer_number)
     }
     else
     {   
-    document.getElementById('coordinates').innerHTML = "<br><br>"; 
+    document.getElementById('coordinates').innerHTML = default_text;
     
     
     }
@@ -780,6 +783,8 @@ function on_data_load(data)
     map2.dragRotate.disable();
     map2.touchZoomRotate.disableRotation();
     
+     
+      
     d3.selectAll("legend").style("height",legend_height+"px")
     d3.select("#wrapper").style("height",map_height+"px")
     d3.select("#map").style("height",map_height+"px")
@@ -789,19 +794,20 @@ function on_data_load(data)
     d3.select("#sel1").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")
     d3.select("#sel2").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")  
     
+       
       
     d3.select("#footer").style("top",window.innerHeight-bottom_height+7+"px").style("left","0px").style("width",window.innerWidth+"px").style("height",bottom_height+"px")   
     
       d3.select("#vline").style("left",window.innerWidth/2+"px").style("bottom",bottom_height+3+"px").style("height",(window.innerHeight-bottom_height+3)+"px")    
     
-    
+    d3.select("#infotab").style("bottom",(window.innerHeight-infotab_height-1)+"px").style("left",(window.innerWidth*0.5-200-10)+"px").style("height",infotab_height+"px")
       
     document.getElementsByClassName('mapboxgl-canvas')[0].style.height=map_height+"px";
     document.getElementsByClassName('mapboxgl-canvas')[1].style.height=map_height+"px";
     map.resize();
     map2.resize();  
       
-      
+    document.getElementById('coordinates').innerHTML = default_text;    
  }
   
   
