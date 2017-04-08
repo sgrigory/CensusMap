@@ -286,38 +286,40 @@ function createLayer(map,layer_number,upper)
         'type': 'line',
         'style': 'basic',
         'source': "states_src",
-        'layout': {'visibility':'none'},
+        'layout': {'visibility':'visible'},
         
     }, bg_layer);   
      
-        
-    
-    m1 = map.addLayer({
+      m1 = map.addLayer({
         'id': 'fill',
         'type': 'fill',
         'style':'basic',
         'source': "states_src",
-        'layout': {"visibility":"none"},
+        'layout': {"visibility":"visible"},
         'paint': 
              {
             'fill-color':"#00FFFF",
             'fill-opacity': 1
              }
        }, upper);      
-        
+            
     
-    m1 = map.addLayer({
+     m1 = map.addLayer({
         'id': 'fill-counties',
         'type': 'fill',
         'style':'basic',
         'source': "counties_src",
-        'layout': {"visibility":"none"},
+        'layout': {"visibility":"visible"},
         'paint': 
              {
             'fill-color': "#FF00FF",
             'fill-opacity': 1
              }
-       }, upper);     
+       }, 'fill');     
+    
+  
+    
+       
         
         
     m2 = map.addLayer({
@@ -346,7 +348,7 @@ function createLayer(map,layer_number,upper)
                         ]
                     ]
                 },
-                "visibility":"none"   
+                "visibility":"visible"   
 
      // "text-max-size": 30,
       //"text-letter-spacing": 0.4,
@@ -364,7 +366,7 @@ function createLayer(map,layer_number,upper)
         'type': 'line',
         'style':'basic',
         'source': "states_src",
-        'layout': {"visibility":"none"},
+        'layout': {"visibility":"visible"},
         'filter':['==',"name",""],
         'paint':{
             "line-color":"#000000",
@@ -487,7 +489,7 @@ function layer(map,layer_number,prop)
     
     updateFill(map,prop)  
       
-    setVisibility(map, layer_number,prop,counties_flag,"visible")
+    //setVisibility(map, layer_number,prop,counties_flag,"visible")
       
 
     console.log("finish layer")      
@@ -515,9 +517,16 @@ function layer(map,layer_number,prop)
    function fun(map,ln)
     {
       console.log("fun:", map,ln)    
-      var counties_flag = document.getElementById("county_state_slider").checked && draw_county_borders
+      var counties_flag = document.getElementById("county_state_slider").checked 
       
-      setVisibility(map, ln, prop, counties_flag, "none")
+      if (counties_flag)
+          map.setLayoutProperty("fill","visibility","none")
+      else
+          map.setLayoutProperty("fill","visibility","visible")
+      
+      
+      
+      //setVisibility(map, ln, prop, counties_flag, "none")
         
       var p0 = document.getElementById("sel"+ln).value
       
@@ -526,8 +535,9 @@ function layer(map,layer_number,prop)
       else
         prop2 = p0   
     
-          
-      setVisibility(map, ln, p0, counties_flag, "visible")
+     
+        
+     // setVisibility(map, ln, p0, counties_flag, "visible")
         
       updateFill(map,p0)    
         
