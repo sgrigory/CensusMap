@@ -97,7 +97,8 @@
   width:100%;
   margin-top:0px;
   margin-bottom: 00px;
-  outline:none;      
+  outline:none;
+//  transform: scale(0.5,0.5);
   }
 #map2
   {
@@ -234,10 +235,10 @@ input:checked + .slider:before {
     
   var bg_layer='water'
   var draw_county_borders = false;   
-  var init_zoom = 2.5;
+  var init_zoom = 3;//2.5;
   var prop,prop2;
-  var us_center = [-98.5795, 39.8282+0.7];
-  var bounds = [[us_center[0]-45,us_center[1]-22],[us_center[0]+40,us_center[1]+15]];
+  var us_center = [-98.5795+1.3, 39.8282+0.7-3.0];
+  var bounds = [[us_center[0]-45*1.0,us_center[1]-22*1.0],[us_center[0]+40*1.0,us_center[1]+15*1.0]];
   
   var options = ['per_dem', 'per_gop',"PST120214", 'AGE135214',
        'AGE295214', 'AGE775214', 'SEX255214', 'RHI125214',
@@ -259,8 +260,8 @@ input:checked + .slider:before {
   var map;
 //file_name = "http://127.0.0.1:8080/cb_2015_us_county_5m.json";
 
-//var basePath = "http://127.0.0.1:8080/";
-var basePath = "./";
+var basePath = "http://127.0.0.1:8080/";
+//var basePath = "./";
     
 var file_names = [ basePath+"test_states.json", basePath+"test.json"]  
 var file_name = file_names[0];
@@ -276,16 +277,41 @@ var current_name = "",current_name_detailed = "";
 var default_text = "US<br>Population: 326625791<br>Total votes: 130188251"    
     
 var selected_unit_layer    
-    
+
+var states_src =  {
+            "url":"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.90y9fz8f",
+    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.6z8lhya5,grisha-oryol.5zgqfhmy",
+    // "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.axthyzlw",//"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z",
+            "type": "vector"
+        }
+
+states_src = "states_src"
+
+var counties_src = {
+   "url": "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.9272rx3d",
+    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.6z8lhya5,grisha-oryol.5zgqfhmy",
+    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.7yz760wm",
+    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.8lt9wzey",
+    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.20z954b8",
+    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.3qb22pxa",
+   // "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.9c8q5910",
+     // "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z",
+    "type": "vector"
+}
+
+//counties_src = "counties_src"
+
+
 function createLayer(map,layer_number,upper) 
     {
        
-        
+    
        m3 = map.addLayer({
         'id': 'lines',
         'type': 'line',
         'style': 'basic',
-        'source': "states_src",
+        'source': states_src,
+        'source-layer': "test_states-6w4wcc",   
         'layout': {'visibility':'visible'},
         
     }, bg_layer);   
@@ -294,7 +320,8 @@ function createLayer(map,layer_number,upper)
         'id': 'fill',
         'type': 'fill',
         'style':'basic',
-        'source': "states_src",
+        'source': states_src,
+        'source-layer': "test_states-6w4wcc",    
         'layout': {"visibility":"visible"},
         'paint': 
              {
@@ -308,7 +335,8 @@ function createLayer(map,layer_number,upper)
         'id': 'fill-counties',
         'type': 'fill',
         'style':'basic',
-        'source': "counties_src",
+        'source': counties_src,//"counties_src",
+        'source-layer': "test",
         'layout': {"visibility":"visible"},
         'paint': 
              {
@@ -350,9 +378,7 @@ function createLayer(map,layer_number,upper)
                 },
                 "visibility":"visible"   
 
-     // "text-max-size": 30,
-      //"text-letter-spacing": 0.4,
-//      "text-line-height": 1.8
+   
                   },
         'paint': {"text-color": "#666",
                 "text-halo-color": "rgba(255,255,255,0.75)",
@@ -365,7 +391,8 @@ function createLayer(map,layer_number,upper)
         'id': 'selected_unit',
         'type': 'line',
         'style':'basic',
-        'source': "states_src",
+        'source': states_src,
+        'source-layer': "test_states-6w4wcc",  
         'layout': {"visibility":"visible"},
         'filter':['==',"name",""],
         'paint':{
@@ -377,49 +404,12 @@ function createLayer(map,layer_number,upper)
     console.log("selected layer:",selected_unit_layer)
         
     }
-    
-function setVisibility(map,layer_number, prop,counties_flag,visibility)
-    {
-     console.log("setting visibility:",map,layer_number,prop,counties_flag,visibility)
-        
-    /*      if (counties_flag)
-    {
-        
-        map.setLayoutProperty("lines-counties"+prop,"visibility",visibility)
-        
-    
-        //console.log('lines-counties'+prop,m4)
-    }*/
-    
-    map.setLayoutProperty("fill-counties","visibility","none")
-    map.setLayoutProperty("fill","visibility","none")
-        
-    if    (document.getElementById("county_state_slider").checked)
-        
-        map.setLayoutProperty("fill-counties","visibility",visibility)
-    
-    else
-        map.setLayoutProperty("fill","visibility",visibility)    
-      
-     map.setLayoutProperty("lines","visibility",visibility)
-      
-     map.setLayoutProperty("text","visibility",visibility) 
-     
-     map.setLayoutProperty("selected_unit","visibility",visibility)
-        
-      console.log("finish setVisability")
-        
-    }
+ 
 
 function updateFill(map,prop)
     {
      console.log("updating fill:",map,prop)    
-    /* map.getLayer("fill").paint = {
-                 property:prop,
-                 type:'exponential',
-                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
-                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
-                 }*/
+   
     map.setPaintProperty("fill","fill-color",{
                  property:prop,
                  type:'exponential',
@@ -434,21 +424,7 @@ function updateFill(map,prop)
                         [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
                  })
     
-       /* 
-    map.getLayer("fill").paint = {
-                 property:prop,
-                 type:'exponential',
-                 stops:[[0,color_min], //rgba(0,0,100,0.75)"
-                        [1,color_max]]//"rgba(100,0,0,0.75)"
-    }
-        
-    map.getLayer("fill-counties").paint = {
-                 property:prop,
-                 type:'exponential',
-                 stops:[[maxmins.responseJSON[units]['mins'][prop],color_min], //rgba(0,0,100,0.75)"
-                        [maxmins.responseJSON[units]['maxs'][prop],color_max]]//"rgba(100,0,0,0.75)"
-                 }  
-    */
+      
 console.log("finish updateFill")
     }
     
@@ -456,47 +432,30 @@ console.log("finish updateFill")
     
 function layer(map,layer_number,prop)  
   { 
+    
+    
+     map.addSource("states_src", {
+            'type': 'vector',
+            'url': "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.90y9fz8f"
+        }
+                 )  
       
     var upper;
     
     var counties_flag = document.getElementById("county_state_slider").checked && draw_county_borders  
       
-    map.addSource("states_src", {
-            'type': 'geojson',
-            'data': file_names[0],
-            buffer: 256
-        }
-                 )
-        
-    map.addSource("counties_src", {
-            'type': 'geojson',
-            'data': file_names[1],
-            buffer: 256
-        }
-                 )
-  /*  if (counties_flag)
-       
-        upper = "lines-counties"  
-      
-    else*/
+  
         
     upper = "lines"
       
     console.log("creating layers.. ")
       
-   // for (var i=0;i<options.length;i++)
     createLayer(map,layer_number,upper)
     
     updateFill(map,prop)  
-      
-    //setVisibility(map, layer_number,prop,counties_flag,"visible")
-      
 
     console.log("finish layer")      
-   /* console.log('fill'+layer_number,m1)
-    console.log('text'+layer_number,m2)  
-    console.log('lines'+layer_number,m3)  */
-    
+ 
  };
   
  function layer1()
@@ -525,8 +484,6 @@ function layer(map,layer_number,prop)
           map.setLayoutProperty("fill","visibility","visible")
       
       
-      
-      //setVisibility(map, ln, prop, counties_flag, "none")
         
       var p0 = document.getElementById("sel"+ln).value
       
@@ -816,9 +773,11 @@ function on_data_load(data)
     document.getElementsByClassName('mapboxgl-canvas')[0].style.height=map_height+"px";
     document.getElementsByClassName('mapboxgl-canvas')[1].style.height=map_height+"px";
     map.resize();
-    map2.resize();  
+    map2.resize();   
       
     document.getElementById('coordinates').innerHTML = default_text;    
+      
+      
  }
   
   
