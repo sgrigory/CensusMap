@@ -253,19 +253,15 @@ input:checked + .slider:before {
        'SBO415207', 'SBO015207', 'MAN450207', 'WTN220207',
        'RTN130207', 'AFN120207', 'BPS030214',
        'LND110210', 'POP060210'];
-    //HSD410213,RTN131207
+
   color_min = "#FFEDA0" 
   color_max = "#BD0026"
     
   var map;
-//file_name = "http://127.0.0.1:8080/cb_2015_us_county_5m.json";
 
 //var basePath = "http://127.0.0.1:8080/";
 var basePath = "./";
     
-var file_names = [ basePath+"test_states.json", basePath+"test.json"]  
-var file_name = file_names[0];
-
 var state_centers_source = basePath+"us-state-centroids.json"
     
 var names = "abbr";
@@ -280,8 +276,6 @@ var selected_unit_layer
 
 var states_src =  {
             "url":"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.90y9fz8f",
-    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.6z8lhya5,grisha-oryol.5zgqfhmy",
-    // "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.axthyzlw",//"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z",
             "type": "vector"
         }
 
@@ -289,17 +283,9 @@ states_src = "states_src"
 
 var counties_src = {
    "url": "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.9272rx3d",
-    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.6z8lhya5,grisha-oryol.5zgqfhmy",
-    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.7yz760wm",
-    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.8lt9wzey",
-    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.20z954b8",
-    //"mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.3qb22pxa",
-   // "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z,grisha-oryol.9c8q5910",
-     // "mapbox://mapbox.mapbox-streets-v7,grisha-oryol.cj1ajuyps004132pi01znlkza-3ui2z",
     "type": "vector"
 }
 
-//counties_src = "counties_src"
 
 
 function createLayer(map,layer_number,upper) 
@@ -335,7 +321,7 @@ function createLayer(map,layer_number,upper)
         'id': 'fill-counties',
         'type': 'fill',
         'style':'basic',
-        'source': counties_src,//"counties_src",
+        'source': counties_src,
         'source-layer': "test",
         'layout': {"visibility":"visible"},
         'paint': 
@@ -492,9 +478,6 @@ function layer(map,layer_number,prop)
       else
         prop2 = p0   
     
-     
-        
-     // setVisibility(map, ln, p0, counties_flag, "visible")
         
       updateFill(map,p0)    
         
@@ -530,7 +513,6 @@ function on_zoom2(data)
     
 function on_mousemove(e,map0,layer_number)
     {
-        //console.log("mousemove: ",map0,layer_number)
         var fill_layer = document.getElementById("county_state_slider").checked ? 'fill-counties':'fill'
         
         features = map0.queryRenderedFeatures(e.point,{layers:[fill_layer]});
@@ -602,7 +584,6 @@ function on_mousemove2(e) {
 function county_state_slider(e)
   {
     console.log("switched!")
-    file_name = document.getElementById("county_state_slider").checked?file_names[1]:file_names[0];
     units = document.getElementById("county_state_slider").checked?"counties":"states";
     fun1(e);
     fun2(e);
