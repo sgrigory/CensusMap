@@ -35,9 +35,18 @@
 
 <body class="htmlNoPages">
      
-    
-    
+  
  <style> 
+     
+       html,body {
+    overflow: scroll;
+}
+
+.container, .contents {
+    overflow: scroll;
+}
+    
+     
 #footer
      {
         position: absolute;
@@ -51,7 +60,8 @@
   margin-right: auto;
   margin-left: auto;
   margin-top:00px;
-  outline:none;  
+  outline:none;
+        
   }
 #block1
    {
@@ -126,6 +136,7 @@
      {
     width:100%;
     margin-bottom:0px; 
+    overflow:scroll;     
      }
      
 .switch {
@@ -239,10 +250,11 @@ input:checked + .slider:before {
     <p id="coordinates"><br> </p>
   </div>      
 <script>
-  var map_height = 400;
-  var legend_height = 20;
-  var bottom_height = 25;
-  var infotab_height = 100;    
+  var init_height = 749.    
+  var map_height = 400/init_height*window.innerHeight;
+  var legend_height = 20/init_height*window.innerHeight;
+  var bottom_height = 25/init_height*window.innerHeight;
+  var infotab_height = 100/init_height*window.innerHeight;    
     
   var bg_layer='water'
   var draw_county_borders = false;   
@@ -669,6 +681,64 @@ function county_state_slider(e)
     
   var features;
   
+function on_resize()
+    {
+         var init_height = 749.    
+  var map_height = 400/init_height*window.innerHeight;
+  var legend_height = 20/init_height*window.innerHeight;
+  var bottom_height = 25/init_height*window.innerHeight;
+  var infotab_height = 100/init_height*window.innerHeight;      
+     
+ if (bottom_height<10)
+     bottom_height = 10;
+        
+      
+    d3.selectAll("legend").style("height",legend_height+"px")
+    //d3.selectAll("legend").style("height","2.6%")
+    d3.select("#wrapper").style("height",map_height+"px")
+      //d3.select("#wrapper").style("width",1000+"px") 
+      //d3.select("#wrapper").style("height","53.4%")
+    //d3.select("#map").style("height",map_height+"px")
+     d3.select("#map").style("height", "100%")
+     d3.select("#map2").style("height", "100%")
+     d3.select("#block1").style("height", "100%")
+     d3.select("#block2").style("height", "100%")//"53.4%")
+    //d3.select("#map").style("width","100%")
+   // d3.select("#map2").style("width","100%")
+//    d3.select("#map2").style("height",map_height+"px")
+   // d3.select("#block1").style("height",map_height+"px")  
+//    d3.select("#block2").style("height",map_height+"px")  
+    d3.select("#sel1").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")
+    d3.select("#sel2").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")  
+    
+       
+      
+    d3.select("#footer").style("top",(window.innerHeight-bottom_height+7)+"px").style("left","0px").style("width",window.innerWidth+"px").style("height",3.3+"%")   
+    
+     // d3.select("#vline").style("left",window.innerWidth/2+"px").style("bottom",bottom_height+3+"px").style("height",(window.innerHeight-bottom_height+3)+"px")    
+    
+       d3.select("#vline").style("left","50%").style("bottom",bottom_height+3+"px").style("height",(window.innerHeight-bottom_height+3)+"px")    
+    
+      
+      
+    d3.select("#infotab").style("bottom",(window.innerHeight-infotab_height-1)+"px").style("left",(window.innerWidth*0.5-200-10)+"px").style("height",infotab_height+"px")
+      
+    document.getElementsByClassName('mapboxgl-canvas')[0].style.height="100%"//map_height+"px";
+    document.getElementsByClassName('mapboxgl-canvas')[1].style.height="100%"//+"px";
+    map.resize();
+    map2.resize();   
+      
+    d3.select("#legend1").selectAll("svg").remove()
+    d3.select("#legend2").selectAll("svg").remove()
+    
+    var prop=document.getElementById("sel1").value;
+    var prop2=document.getElementById("sel2").value;    
+    add_legend("#legend1",prop)    
+    add_legend("#legend2",prop2)    
+    
+        
+    }
+    
 function on_data_load(data) 
   {
       
@@ -743,29 +813,9 @@ function on_data_load(data)
     map2.dragRotate.disable();
     map2.touchZoomRotate.disableRotation();
     
-     
+    window.addEventListener("resize", on_resize);
       
-    d3.selectAll("legend").style("height",legend_height+"px")
-    d3.select("#wrapper").style("height",map_height+"px")
-    d3.select("#map").style("height",map_height+"px")
-    d3.select("#map2").style("height",map_height+"px")
-    d3.select("#block1").style("height",map_height+"px")  
-    d3.select("#block2").style("height",map_height+"px")  
-    d3.select("#sel1").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")
-    d3.select("#sel2").style("height",(window.innerHeight-map_height-legend_height-bottom_height)+"px")  
-    
-       
-      
-    d3.select("#footer").style("top",window.innerHeight-bottom_height+7+"px").style("left","0px").style("width",window.innerWidth+"px").style("height",bottom_height+"px")   
-    
-      d3.select("#vline").style("left",window.innerWidth/2+"px").style("bottom",bottom_height+3+"px").style("height",(window.innerHeight-bottom_height+3)+"px")    
-    
-    d3.select("#infotab").style("bottom",(window.innerHeight-infotab_height-1)+"px").style("left",(window.innerWidth*0.5-200-10)+"px").style("height",infotab_height+"px")
-      
-    document.getElementsByClassName('mapboxgl-canvas')[0].style.height=map_height+"px";
-    document.getElementsByClassName('mapboxgl-canvas')[1].style.height=map_height+"px";
-    map.resize();
-    map2.resize();   
+    on_resize()
       
     document.getElementById('coordinates').innerHTML = default_text;    
       
