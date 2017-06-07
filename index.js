@@ -13,6 +13,11 @@ app.get('/', function(request, response) {
   response.render('pages/test');
 });
 
+
+app.get('/france', function(request, response) {
+  response.render('pages/leaflet');
+});
+
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });

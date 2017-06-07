@@ -1,0 +1,355 @@
+<html>
+<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+
+<head>
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+   integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+   crossorigin=""/>    
+
+ <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
+   integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+   crossorigin=""></script>    
+    
+
+    <script src="https://unpkg.com/shpjs@latest/dist/shp.js"> </script>
+    
+   
+    
+<title> heyhey </title>
+
+    
+<style>
+		#map {
+			width: 100%;
+			height: 100%;
+		}
+    
+    .my-label {
+    position: absolute;
+    width:auto;
+    font-size:10px;
+    opacity: 0;
+    fill:"#00FF00";
+    color:"aqua";
+    text-align: center;
+    align-self:center;
+    background: none;
+    border: none;
+    box-shadow: none;
+    text-shadow: 0.5px 0.5px 0.5px #ffffff;
+    font-family:"Times New Roman";
+     
+    
+}
+ .my-popup .leaflet-popup-tip,
+.my-popup .leaflet-popup-content-wrapper {
+        opacity: 0.8;
+        
+    }
+    
+    
+    .leaflet-tooltip-left.my-label::before {
+  border-left-color: none;
+  text-align: center;
+  display: none;        
+}
+.leaflet-tooltip-right.my-label::before {
+  border-right-color: none;
+  text-align: center;
+  display: none;  
+}
+    
+	</style>
+    
+    
+    
+</head>
+
+
+<body onmousemove="onAdd()">
+    
+    <div id="map" onmousemove="onAdd()"></div>
+    
+    
+    <script>
+        
+        var basePath="./" //"http://127.0.0.1:8080/";
+        
+        var maxZoom=8,minZoom=6;
+        
+        var corner1 = L.latLng(52, 11)
+        var corner2 = L.latLng(41, -6)
+        
+        var mymap = L.map('map',{
+                                 inertia:false,
+                                 animation:false,
+                                 maxZoom:maxZoom,
+                                 minZoom:minZoom,
+                                 maxBounds:L.latLngBounds(corner1, corner2)}).setView([46.5, 1], 6);
+
+var showComm=false;        
+        
+var already=false;
+       
+        
+var param="MACRON_y";        
+        
+
+var ft;
+        
+function getCenter(obj)
+        {
+           if (obj.type=='Polygon')
+               {
+                  
+               console.log('Polygon!')
+              
+            var x=0,y=0;
+            
+            for (var i=0;i<obj.coordinates[0].length;i++)
+                {
+                    // console.log(x,y, obj.coordinates)
+                    x+=obj.coordinates[0][i][0]
+                    y+=obj.coordinates[0][i][1]
+                }
+            
+            x=x/(obj.coordinates[0].length)
+            y=y/(obj.coordinates[0].length)
+          //  console.log(x,y)
+            return [x,y]
+        }
+        
+        else
+            if (obj.type=='MultiPolygon')
+               {
+                  
+              console.log('MultiPolygon!')
+            var x=0,y=0;
+            
+            for (var i=0;i<obj.coordinates[0][0].length;i++)
+                {
+                   //  console.log(x,y)
+                    x+=obj.coordinates[0][0][i][0]
+                    y+=obj.coordinates[0][0][i][1]
+                }
+            
+            x=x/(obj.coordinates[0][0].length)
+            y=y/(obj.coordinates[0][0].length)
+            //console.log(x,y)
+            return [x,y]
+               }
+                
+        }
+function onEachDeps(feature,layer)
+        {
+            
+        //layer.bindPopup(feature.properties.MACRON_y);
+        var lst=feature.geometry.bbox
+        //console.log(feature)
+        ft=feature
+         var marker = L.marker([(lst[1]+lst[3])*0.5,(lst[0]+lst[2])*0.5],{opacity:0}).addTo(mymap); //opacity may be set to zero
+        // var center=getCenter(feature.geometry)
+          //  console.log([(lst[0]+lst[2])*0.5,(lst[1]+lst[3])*0.5])
+        //    var marker = L.marker([center[1],center[0]],{opacity:0}).addTo(mymap); //opacity may be set to zero
+        
+            marker.bindTooltip(feature.properties.NOM_DEPT,{direction: 'left',permanent: true,sticky:true, className: "my-label", offset: [0, 0],fillOpacity:0,fill:false,color:"#00FF00" ,fillColor:"#0000FF"
+                                                           });
+           // console.log(marker)
+               
+            //feature.bindTooltip("JJJJ")
+            
+            
+        }
+
+
+function onEachCirc(feature,layer)
+        {
+          //  console.log(feature.properties[param],String((feature.properties[param]*100).toFixed(2)))
+        var popupText = "Department: "+feature.properties.nom_dpt+"<br>"+"Constituency "+feature.properties.num_circ+"<br>"+
+                        param+": "+String((feature.properties[param]*100).toFixed(2));
+            
+        layer.bindPopup(popupText,{className:"my-popup"});
+        
+        layer.on('mouseover', function(e){
+            console.log('mouse over!');
+            layer.openPopup()});    
+            
+        //layer.on('mouseout', function(e){
+        //    console.log('mouse out!');
+          //  layer.closePopup()});    
+              
+        }
+
+        function onEachBord(feature,layer)
+        {
+        }
+        
+        function onEachComm(feature,layer)
+        {
+             var popupText = "Department: "+feature.properties.nom_dpt+"<br>"+"Commune "+feature.properties.NOM_COM+"<br>"+
+                        param+": "+String((feature.properties[param]).toFixed(2));
+            
+        layer.bindPopup(popupText,{className:"my-popup"});
+        
+        layer.on('mouseover', function(e){
+            console.log('mouse over!');
+            layer.openPopup()});   
+            
+        layer.on('mouseout', function(e){
+            console.log('mouse over!');
+            layer.closePopup()}); 
+            
+        }
+        
+var showDeps=false;
+        
+function styleFunDeps(feature)
+        {
+            if (true)
+            return {weight: 1,
+			opacity: 1,
+			color: 'black',
+			fillOpacity: 1,
+            fillColor:feature.properties[param+"_"]}
+            
+            else
+                
+            return {weight: 1,
+			opacity: 1,
+			color: 'black',
+			fillOpacity: 0.0
+                  }
+        }        
+        
+
+function styleFunCirc(feature)
+        {
+            var style = {weight: 0.1,
+			opacity: 1,
+			color: 'black',
+			fillOpacity: 1,
+            fillColor:feature.properties[param+"_"]}
+            
+            if (showComm)
+                
+                style.fill=false;
+    
+            else
+                
+                style.fill=true;
+            
+            return style
+ 
+        }        
+
+function styleFunComm(feature)
+        {
+            var style = {weight: 0.1,
+			opacity: 1,
+			color: 'black',
+			fillOpacity: 1,
+            fillColor:feature.properties[param+"_"]}
+            
+            return style
+ 
+        }  
+        
+        
+function styleFunDepBorders(feature)
+        {
+            var style = {
+            weight: 1,
+			opacity: 1,
+			color: 'black',
+			fillOpacity: 0,
+            fill:false
+        }
+            
+    
+            
+            return style
+            
+            
+        }                
+        
+    var geo = L.geoJson(false,{onEachFeature: onEachDeps,style: styleFunDeps});    
+        
+    var circ = L.geoJson(false,{onEachFeature: onEachCirc,style: styleFunCirc});    
+
+   // var comm = L.geoJson(false,{onEachFeature: onEachComm,style: styleFunComm});        
+        
+    var depBorders = L.geoJson(false,{onEachFeature: onEachBord,style: styleFunDepBorders});    
+    
+        
+  //  var mrk = L.marker([46,0.5])
+    
+    
+       // mymap.fitBounds(geo.getBounds());
+
+    var fl1=false, fl2=false;
+        
+    //var dps, circ_data;    
+       
+    var data1;
+    
+
+    shp(basePath+"deps").then(function(data){
+        console.log('adding geo')
+        geo.addData(data);
+        
+        //data1 = JSON.parse(JSON.stringify(data))
+    
+        console.log('adding borders')
+        
+        depBorders.addData(data);
+
+        console.log('done with borders')
+
+        shp(basePath+"circ").then(function(data2){
+            
+            console.log('adding circ')
+            circ.addData(data2);
+           
+            //shp("http://127.0.0.1:8080/comm").then(function(data3){
+            
+            //comm.addData(data3)    
+                
+            geo.addTo(mymap);
+            depBorders.addTo(mymap);
+            circ.addTo(mymap);
+          //  comm.addTo(mymap);
+           
+                
+            depBorders.bringToFront(); 
+                geo.bringToBack();    
+                })
+            //})
+            console.log("loaded!")
+           // console.log(fl1,fl2);fl1=true;
+            
+           //  mymap.on("layeradd",onAdd)
+    })
+
+        
+    
+function onAdd()
+        {
+            if (! already)
+            {
+                depBorders.bringToFront(); 
+                geo.bringToBack(); 
+                already=true;
+            }
+        }
+        
+        
+   //window.setTimeout(function fun(){console.log("done!");
+   //geo.bringToBack();  },5000);
+    
+   
+    </script>
+
+</body>
+
+
+</html>

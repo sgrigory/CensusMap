@@ -1,0 +1,7 @@
+measure,location,sex,age,cause,metric,year,val,upper,lower
+DALYs (Disability-Adjusted Life Years),Global,Both,All Ages,All causes,Number,2015,2464895386.6523,2696510751.1439,2259888977.2552
+DALYs (Disability-Adjusted Life Years),Global,Both,All Ages,All causes,Percent,2015,1.0,1.0,1.0
+DALYs (Disability-Adjusted Life Years),Global,Both,All Ages,All causes,Rate,2015,33440.136909485,36582.359671593,30658.906698227
+Deaths,Global,Both,All Ages,All causes,Number,2015,55792884.279312,56640301.315165,54984081.209302
+Deaths,Global,Both,All Ages,All causes,Percent,2015,1.0,1.0,1.0
+Deaths,Global,Both,All Ages,All causes,Rate,2015,756.917195395,768.4137206519999,745.944539085
